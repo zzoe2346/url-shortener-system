@@ -99,7 +99,7 @@ class ShortenControllerTest {
         }
 
         @Test
-        void REDIRECT_TO_INVALID_URL_WHEN_NOT_FOUND() throws Exception {
+        void RETURN_404_NOT_FOUND_WHEN_URL_DOES_NOT_EXIST() throws Exception {
             // given
             String nonExistentShortUrl = "zzzzzzz";
 
@@ -108,8 +108,8 @@ class ShortenControllerTest {
 
             // then
             resultActions.andExpectAll(
-                    status().isFound(),
-                    header().string(HttpHeaders.LOCATION, "shorten.com/notify/invalid/url"));
+                    status().isNotFound()
+            );
         }
     }
 
