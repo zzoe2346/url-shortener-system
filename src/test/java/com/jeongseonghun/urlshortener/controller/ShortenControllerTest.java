@@ -94,7 +94,7 @@ class ShortenControllerTest {
             // then
             resultActions.andExpectAll(
                     status().isFound(),
-                    header().string("Location", originalUrl)
+                    header().string(HttpHeaders.LOCATION, originalUrl)
             );
         }
 
