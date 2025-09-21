@@ -3,23 +3,25 @@ package com.jeongseonghun.urlshortener.service;
 import com.jeongseonghun.urlshortener.domain.entity.URL;
 import com.jeongseonghun.urlshortener.domain.repository.UrlRepository;
 import com.jeongseonghun.urlshortener.exception.UrlNotFoundException;
+import com.jeongseonghun.urlshortener.idsupplier.IdSupplier;
 import com.jeongseonghun.urlshortener.util.Base62;
-import com.jeongseonghun.urlshortener.util.IDSupplier;
 import org.springframework.stereotype.Service;
 
 @Service
 public class ShortenService {
 
     private final UrlRepository urlRepository;
+    private final IdSupplier idSupplier;
 
-    public ShortenService(UrlRepository urlRepository) {
+    public ShortenService(UrlRepository urlRepository, IdSupplier idSupplier) {
         this.urlRepository = urlRepository;
+        this.idSupplier = idSupplier;
     }
 
     public String shortenUrl(String originalUrl) {
         return urlRepository.findShortenUrlByOriginalUrl(originalUrl)
                 .orElseGet(() -> {
-                            String shortenUrl = Base62.Encoder.encode(IDSupplier.getId());
+                            String shortenUrl = Base62.Encoder.encode(idSupplier.getId());
                             urlRepository.save(new URL(originalUrl, shortenUrl));
                             return shortenUrl;
                         }
