@@ -2,14 +2,13 @@ package com.jeongseonghun.urlshortener.service;
 
 import com.jeongseonghun.urlshortener.domain.entity.URL;
 import com.jeongseonghun.urlshortener.domain.repository.UrlRepository;
+import com.jeongseonghun.urlshortener.exception.UrlNotFoundException;
 import com.jeongseonghun.urlshortener.util.Base62;
 import com.jeongseonghun.urlshortener.util.IDSupplier;
 import org.springframework.stereotype.Service;
 
 @Service
 public class ShortenService {
-
-    private static final String INVALID_URL_NOTIFY_PAGE_URL = "shorten.com/notify/invalid/url";
 
     private final UrlRepository urlRepository;
 
@@ -29,6 +28,6 @@ public class ShortenService {
 
     public String getOriginalUrl(String shortUrl) {
         return urlRepository.findOriginalUrlByShortenUrl(shortUrl)
-                .orElseGet(() -> INVALID_URL_NOTIFY_PAGE_URL);
+                .orElseThrow(() -> new UrlNotFoundException("해당 단축 URL을 찾을 수 없습니다: " + shortUrl));
     }
 }
