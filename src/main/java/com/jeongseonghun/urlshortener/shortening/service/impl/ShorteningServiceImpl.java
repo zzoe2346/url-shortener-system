@@ -2,10 +2,10 @@ package com.jeongseonghun.urlshortener.shortening.service.impl;
 
 import com.jeongseonghun.urlshortener.shortening.model.entity.Url;
 import com.jeongseonghun.urlshortener.shortening.repository.UrlRepository;
-import com.jeongseonghun.urlshortener.exception.UrlNotFoundException;
+import com.jeongseonghun.urlshortener.common.exception.UrlNotFoundException;
 import com.jeongseonghun.urlshortener.shortening.service.IdSupplier;
 import com.jeongseonghun.urlshortener.shortening.service.ShorteningService;
-import com.jeongseonghun.urlshortener.util.Base62;
+import com.jeongseonghun.urlshortener.common.util.Base62;
 import org.springframework.stereotype.Service;
 
 @Service

@@ -1,4 +1,4 @@
-package com.jeongseonghun.urlshortener.util;
+package com.jeongseonghun.urlshortener.common.util;
 
 import java.util.HashMap;
 import java.util.Map;
