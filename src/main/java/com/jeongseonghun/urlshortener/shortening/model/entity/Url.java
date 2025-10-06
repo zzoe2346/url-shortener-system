@@ -1,4 +1,4 @@
-package com.jeongseonghun.urlshortener.domain.entity;
+package com.jeongseonghun.urlshortener.shortening.model.entity;
 
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -9,7 +9,7 @@ import lombok.Setter;
 @Getter
 @Entity
 @NoArgsConstructor
-public class URL {
+public class Url {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -18,7 +18,7 @@ public class URL {
     @Column(nullable = false, unique = true)
     private String shortenUrl;
 
-    public URL(String originalUrl, String shortenUrl) {
+    public Url(String originalUrl, String shortenUrl) {
         this.originalUrl = originalUrl;
         this.shortenUrl = shortenUrl;
     }

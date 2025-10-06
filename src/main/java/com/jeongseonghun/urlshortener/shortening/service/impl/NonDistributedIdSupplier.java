@@ -1,6 +1,6 @@
-package com.jeongseonghun.urlshortener.idsupplier.impl;
+package com.jeongseonghun.urlshortener.shortening.service.impl;
 
-import com.jeongseonghun.urlshortener.idsupplier.IdSupplier;
+import com.jeongseonghun.urlshortener.shortening.service.IdSupplier;
 import org.springframework.stereotype.Component;
 
 import java.util.concurrent.atomic.AtomicLong;

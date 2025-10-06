@@ -1,4 +1,4 @@
-package com.jeongseonghun.urlshortener.dto;
+package com.jeongseonghun.urlshortener.shortening.model.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
