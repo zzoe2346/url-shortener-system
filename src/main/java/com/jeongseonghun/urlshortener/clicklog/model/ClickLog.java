@@ -1,9 +1,7 @@
 package com.jeongseonghun.urlshortener.clicklog.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import com.jeongseonghun.urlshortener.shortening.model.entity.Url;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -16,6 +14,9 @@ public class ClickLog {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @ManyToOne
+    @JoinColumn(name = "url_id")
+    private Url url;
     private String ipAddress;
     private String userAgent;
     private String referrer;
