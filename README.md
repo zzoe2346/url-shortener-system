@@ -80,6 +80,32 @@
 - 한번 생성된 단축 URL은 삭제되지 않는 한 항상 원래의 URL로 정확하게 리다이렉션되어야 한다.
 - 클릭 로그 데이터의 손실을 최소화해야 한다.
 
+## 4. ERD
+```mermaid
+erDiagram
+    direction LR
+
+    URL {
+        BIGINT id PK
+        VARCHAR originalUrl
+        VARCHAR shortenedUrl
+        DATETIME createdAt
+        DATETIME expiredAt
+    }
+
+    CLICK_LOG {
+        BIGINT id PK
+        BIGINT urlId FK
+        VARCHAR ipAddress
+        VARCHAR userAgent
+        VARCHAR referrer
+        VARCHAR acceptLanguage
+        DATETIME clickedAt
+    }
+
+    URL ||--o{ CLICK_LOG : "One To Many"
+
+```
 
 
 
