@@ -17,7 +17,7 @@ public class ClickLog {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @ManyToOne
-    @JoinColumn(name = "url_id")
+    @JoinColumn(name = "url_mapping_id")
     private UrlMapping urlMapping;
     private String ipAddress;
     private String userAgent;
