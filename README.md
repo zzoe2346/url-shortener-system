@@ -62,7 +62,7 @@
   - 사용자는 원본 URL을 입력한다.
 - 처리
   - 시스템은 입력된 URL의 유효성을 검증한다. (e.g., http:// 또는 https://로 시작)
-  - 고유하고 충돌 없는 짧은 키(Short Key)를 생성한다. (예: aB1cD2e)
+  - 고유하고 충돌 없는 코드(Short Code)를 생성한다. (예: aB1cD2e)
   - 원본 URL과 짧은 키를 데이터베이스에 매핑하여 저장한다.
 - 출력
   - 생성된 전체 단축 URL을 사용자에게 반환한다. (예: https://jeonsonghun.com/aB1cD2e)
@@ -73,16 +73,16 @@
 - 입력
   - 사용자가 브라우저를 통해 단축 URL에 접속한다.
 - 처리
-  - 시스템은 URL의 짧은 키를 파싱하여 데이터베이스에서 원본 URL을 조회한다.
-  - 해당 키가 존재하면, 원본 URL로 HTTP 301 Moved Permanently 리다이렉션을 수행한다.
-  - 해당 키가 존재하지 않으면, 404 Not Found 페이지를 반환한다.
+  - 시스템은 URL의 PathVariable의 ShortCode를 파싱하여 데이터베이스에서 원본 URL을 조회한다.
+  - 해당 ShortCode가 존재하면, 원본 URL로 HTTP 301 Moved Permanently 리다이렉션을 수행한다.
+  - 해당 ShortCode가 존재하지 않으면, 404 Not Found 페이지를 반환한다.
 - 부가 처리
   - 리다이렉션이 성공할 때마다 '클릭 로그'를 기록한다.
 
 #### 3) 단축 URL 클릭 로그 기록 및 통계 조회 기능
 - 로그 기록
   - 리다이렉션이 발생할 때마다 다음 정보를 수집하여 별도의 로그 저장소나 메시지 큐로 전송한다.
-    - 단축 키 (Short Key)
+    - 단축 코드 (ShortCode)
     - 클릭 발생 시간 (Timestamp)
     - 접속 IP 주소 (IP Address)
     - 사용자 환경 정보 (User-Agent)
