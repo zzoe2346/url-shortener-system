@@ -23,14 +23,14 @@ public class ShorteningServiceImpl implements ShorteningService {
         this.clickLogService = clickLogService;
     }
 
-    public String shortenUrl(String originalUrl) {
-        return urlMappingRepository.findShortenUrlByOriginalUrl(originalUrl)
+    public String getOrCreateShortUrl(String originalUrl) {
+        UrlMapping urlMapping = urlMappingRepository.findByOriginalUrl(originalUrl)
                 .orElseGet(() -> {
-                            String shortenUrl = Base62.Encoder.encode(idSupplier.getId());
-                            urlMappingRepository.save(new UrlMapping(originalUrl, shortenUrl));
-                            return shortenUrl;
+                            String shortCode = Base62.Encoder.encode(idSupplier.getId());
+                            return urlMappingRepository.save(new UrlMapping(originalUrl, shortCode));
                         }
                 );
+        return urlMapping.getShortUrl();
     }
 
     public String getOriginalUrl(String shortUrl, HttpServletRequest request) {

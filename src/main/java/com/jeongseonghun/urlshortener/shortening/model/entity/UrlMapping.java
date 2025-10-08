@@ -1,6 +1,7 @@
 package com.jeongseonghun.urlshortener.shortening.model.entity;
 
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -20,14 +21,19 @@ public class UrlMapping {
     @Column(nullable = false, unique = true)
     private String originalUrl;
     @Column(nullable = false, unique = true)
-    private String shortenUrl;
+    private String shortCode;
     @CreationTimestamp
     private LocalDateTime createdAt;
     @UpdateTimestamp
     private LocalDateTime updatedAt;
 
-    public UrlMapping(String originalUrl, String shortenUrl) {
+    @Builder
+    public UrlMapping(String originalUrl, String shortCode) {
         this.originalUrl = originalUrl;
-        this.shortenUrl = shortenUrl;
+        this.shortCode = shortCode;
+    }
+
+    public String getShortUrl(){
+        return "https://jeongseonghun.com/" + this.shortCode;
     }
 }
