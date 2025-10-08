@@ -33,7 +33,7 @@ public class UrlMapping {
         this.shortCode = shortCode;
     }
 
-    public String getShortUrl(){
-        return "https://jeongseonghun.com/" + this.shortCode;
+    public String getShortUrl(String domain) {
+        return domain + this.shortCode;
     }
 }

@@ -1,6 +1,7 @@
 package com.jeongseonghun.urlshortener.shortening.service.impl;
 
 import com.jeongseonghun.urlshortener.clicklog.service.ClickLogService;
+import com.jeongseonghun.urlshortener.common.config.AppProperties;
 import com.jeongseonghun.urlshortener.common.exception.UrlNotFoundException;
 import com.jeongseonghun.urlshortener.common.util.Base62;
 import com.jeongseonghun.urlshortener.shortening.model.entity.UrlMapping;
@@ -20,17 +21,19 @@ public class ShorteningServiceImpl implements ShorteningService {
     private final ClickLogService clickLogService;
     private final ValidationHandler shortenChain;
     private final ValidationHandler redirectChain;
+    private final AppProperties appProperties;
 
     public ShorteningServiceImpl(UrlMappingRepository urlMappingRepository,
                                  IdSupplier idSupplier,
                                  ClickLogService clickLogService,
                                  @Qualifier("shortenValidationChain") ValidationHandler shortenChain,
-                                 @Qualifier("redirectValidationChain") ValidationHandler redirectChain) {
+                                 @Qualifier("redirectValidationChain") ValidationHandler redirectChain, AppProperties appProperties) {
         this.urlMappingRepository = urlMappingRepository;
         this.idSupplier = idSupplier;
         this.clickLogService = clickLogService;
         this.shortenChain = shortenChain;
         this.redirectChain = redirectChain;
+        this.appProperties = appProperties;
     }
 
     public String getOrCreateShortUrl(String originalUrl) {
@@ -42,7 +45,7 @@ public class ShorteningServiceImpl implements ShorteningService {
                             return urlMappingRepository.save(new UrlMapping(originalUrl, shortCode));
                         }
                 );
-        return urlMapping.getShortUrl();
+        return urlMapping.getShortUrl(appProperties.getDomain());
     }
 
     public String getOriginalUrl(String shortCode, HttpServletRequest request) {
