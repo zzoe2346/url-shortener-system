@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 @Getter
 @Entity
 @NoArgsConstructor
-public class Url {
+public class UrlMapping {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -26,7 +26,7 @@ public class Url {
     @UpdateTimestamp
     private LocalDateTime updatedAt;
 
-    public Url(String originalUrl, String shortenUrl) {
+    public UrlMapping(String originalUrl, String shortenUrl) {
         this.originalUrl = originalUrl;
         this.shortenUrl = shortenUrl;
     }

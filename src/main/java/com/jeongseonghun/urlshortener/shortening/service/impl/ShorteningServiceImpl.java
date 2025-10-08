@@ -1,6 +1,6 @@
 package com.jeongseonghun.urlshortener.shortening.service.impl;
 
-import com.jeongseonghun.urlshortener.shortening.model.entity.Url;
+import com.jeongseonghun.urlshortener.shortening.model.entity.UrlMapping;
 import com.jeongseonghun.urlshortener.shortening.repository.UrlRepository;
 import com.jeongseonghun.urlshortener.common.exception.UrlNotFoundException;
 import com.jeongseonghun.urlshortener.shortening.service.IdSupplier;
@@ -23,7 +23,7 @@ public class ShorteningServiceImpl implements ShorteningService {
         return urlRepository.findShortenUrlByOriginalUrl(originalUrl)
                 .orElseGet(() -> {
                             String shortenUrl = Base62.Encoder.encode(idSupplier.getId());
-                            urlRepository.save(new Url(originalUrl, shortenUrl));
+                            urlRepository.save(new UrlMapping(originalUrl, shortenUrl));
                             return shortenUrl;
                         }
                 );
