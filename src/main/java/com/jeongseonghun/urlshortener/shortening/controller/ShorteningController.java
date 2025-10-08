@@ -34,9 +34,9 @@ public class ShorteningController {
      */
     @PostMapping("/urls")
     public ResponseEntity<ShortenResponse> shorten(@Valid @RequestBody ShortenRequest request) {
-        String shortenUrl = shorteningService.getOrCreateShortUrl(request.originalUrl());
+        String shortUrl = shorteningService.getOrCreateShortUrl(request.originalUrl());
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(new ShortenResponse(shortenUrl));
+                .body(new ShortenResponse(shortUrl));
     }
 
     /**
