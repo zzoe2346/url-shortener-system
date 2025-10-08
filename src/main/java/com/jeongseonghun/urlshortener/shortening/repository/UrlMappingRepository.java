@@ -6,7 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 
 import java.util.Optional;
 
-public interface UrlRepository extends JpaRepository<UrlMapping, Long> {
+public interface UrlMappingRepository extends JpaRepository<UrlMapping, Long> {
 
     @Query("SELECT u.shortenUrl " +
             "FROM UrlMapping u " +
@@ -17,4 +17,7 @@ public interface UrlRepository extends JpaRepository<UrlMapping, Long> {
             "FROM UrlMapping u " +
             "WHERE u.shortenUrl = :shortenUrl")
     Optional<String> findOriginalUrlByShortenUrl(String shortenUrl);
+
+    Optional<UrlMapping> findUrlMappingByShortenUrl(String ShortenUrl);
+
 }

@@ -48,8 +48,8 @@ public class ShorteningController {
      * @return 리다이렉션 정보를 담은 ResponseEntity 객체
      */
     @GetMapping("/{shortUrl}")
-    public ResponseEntity<Void> redirect(@PathVariable String shortUrl) {
-        String originalUrl = shorteningService.getOriginalUrl(shortUrl);
+    public ResponseEntity<Void> redirect(@PathVariable String shortUrl,HttpServletRequest request) {
+        String originalUrl = shorteningService.getOriginalUrl(shortUrl, request);
         return ResponseEntity.status(HttpStatus.FOUND)
                 .location(URI.create(originalUrl))
                 .build();

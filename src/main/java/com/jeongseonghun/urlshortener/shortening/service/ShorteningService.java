@@ -1,5 +1,7 @@
 package com.jeongseonghun.urlshortener.shortening.service;
 
+import jakarta.servlet.http.HttpServletRequest;
+
 /**
  * URL 단축 기능의 핵심 비즈니스 로직을 정의하는 인터페이스.
  */
@@ -19,5 +21,5 @@ public interface ShorteningService {
      * @param shortUrl 단축 URL
      * @return 매핑된 원본 URL
      */
-    String getOriginalUrl(String shortUrl);
+    String getOriginalUrl(String shortUrl, HttpServletRequest request);
 }
