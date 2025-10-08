@@ -17,8 +17,7 @@
 
 **키워드:** 디자인 패턴, 가용성(Availability), 확장성(Scalability), 트레이드오프(Trade-off), Kafka, Redis, 부하 테스트
 
-## 1. 기술 스택
-
+### 0.1 기술 스택
 | 구분                   | 사용 기술                             |
 | -------------------- |-----------------------------------|
 | **Backend**          | Java 17, Spring Boot, Spring Data JPA |
@@ -26,6 +25,12 @@
 | **DevOps / Infra**   | AWS (EC2, RDS, MKS 등), Docker     |
 | **Test / Load**      | JUnit5, Locust, k6                |
 | **ETC**              | Kafka                             |
+
+## 1. 시스템 아키텍처
+<img width="5789" height="3450" alt="image" src="https://github.com/user-attachments/assets/131f12da-d23e-4cb0-b49d-14ae5dad01f5" />
+
+
+
 
 ## 2. 주요 기능 및 기술적 도전 과제
 ### 2.1 디자인 패턴을 활용한 유연하고 확장성 있는 설계
