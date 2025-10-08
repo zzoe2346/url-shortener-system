@@ -44,12 +44,12 @@ public class ShorteningController {
      * <p>
      * 매핑된 원본 URL을 찾으면 HTTP 302 Found 상태 코드로 리다이렉트 응답을 보낸다.
      * </p>
-     * @param shortUrl 경로 변수(path variable)로 전달된 단축 URL
+     * @param shortCode 경로 변수(path variable)로 전달된 단축 코드(우리 서비스에서 만든 코드)
      * @return 리다이렉션 정보를 담은 ResponseEntity 객체
      */
-    @GetMapping("/{shortUrl}")
-    public ResponseEntity<Void> redirect(@PathVariable String shortUrl,HttpServletRequest request) {
-        String originalUrl = shorteningService.getOriginalUrl(shortUrl, request);
+    @GetMapping("/{shortCode}")
+    public ResponseEntity<Void> redirect(@PathVariable String shortCode,HttpServletRequest request) {
+        String originalUrl = shorteningService.getOriginalUrl(shortCode, request);
         return ResponseEntity.status(HttpStatus.FOUND)
                 .location(URI.create(originalUrl))
                 .build();

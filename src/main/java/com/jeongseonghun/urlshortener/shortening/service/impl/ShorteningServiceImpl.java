@@ -33,9 +33,9 @@ public class ShorteningServiceImpl implements ShorteningService {
         return urlMapping.getShortUrl();
     }
 
-    public String getOriginalUrl(String shortUrl, HttpServletRequest request) {
-        UrlMapping urlMapping = urlMappingRepository.findUrlMappingByShortenUrl(shortUrl)
-                .orElseThrow(() -> new UrlNotFoundException("해당 단축 URL을 찾을 수 없습니다: " + shortUrl));
+    public String getOriginalUrl(String shortCode, HttpServletRequest request) {
+        UrlMapping urlMapping = urlMappingRepository.findByShortCode(shortCode)
+                .orElseThrow(() -> new UrlNotFoundException("해당 단축 코드를 찾을 수 없습니다: " + shortCode));
 
         clickLogService.recordClick(request, urlMapping);
 
