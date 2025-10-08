@@ -87,17 +87,17 @@
 erDiagram
     direction LR
 
-    URL {
+    URL_MAPPING {
         BIGINT id PK
         VARCHAR originalUrl
-        VARCHAR shortenedUrl
+        VARCHAR shortCode
         DATETIME createdAt
         DATETIME expiredAt
     }
 
     CLICK_LOG {
         BIGINT id PK
-        BIGINT urlId FK
+        BIGINT urlMaapingId FK
         VARCHAR ipAddress
         VARCHAR userAgent
         VARCHAR referrer
@@ -105,7 +105,8 @@ erDiagram
         DATETIME clickedAt
     }
 
-    URL ||--o{ CLICK_LOG : "One To Many"
+    URL_MAPPING ||--o{ CLICK_LOG : "One To Many"
+    CLICK_LOG ||--o{ URL_MAPPING : "Many To One"  
 
 ```
 
