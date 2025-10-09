@@ -1,9 +1,10 @@
-package com.jeongseonghun.urlshortener.controller;
+package com.jeongseonghun.urlshortener.shortening.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.jeongseonghun.urlshortener.domain.entity.URL;
-import com.jeongseonghun.urlshortener.domain.repository.UrlRepository;
-import com.jeongseonghun.urlshortener.dto.ShortenRequest;
+import com.jeongseonghun.urlshortener.common.config.AppProperties;
+import com.jeongseonghun.urlshortener.shortening.model.dto.ShortenRequest;
+import com.jeongseonghun.urlshortener.shortening.model.entity.UrlMapping;
+import com.jeongseonghun.urlshortener.shortening.repository.UrlMappingRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -24,14 +25,15 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
-class ShortenControllerTest {
-
+class ShorteningControllerTest {
     @Autowired
-    private UrlRepository urlRepository;
+    private UrlMappingRepository urlMappingRepository;
     @Autowired
     private MockMvc mockMvc;
     @Autowired
     private ObjectMapper objectMapper;
+    @Autowired
+    private AppProperties appProperties;
 
     @Nested
     @DisplayName("URL 단축 API (POST: /urls)")
@@ -42,7 +44,7 @@ class ShortenControllerTest {
                 "http://originalURL, 2",
                 "https://www.jeongseonghun.com, 3"
         })
-        void SHORTEN_SUCCESS(String originalUrl, String expectedShortUrl) throws Exception {
+        void SHORTEN_SUCCESS(String originalUrl, String shortCode) throws Exception {
             //given
             ShortenRequest request = new ShortenRequest(originalUrl);
 
@@ -54,7 +56,7 @@ class ShortenControllerTest {
             //then
             resultActions.andExpectAll(
                     status().isCreated(),
-                    jsonPath("shortUrl").value(expectedShortUrl)
+                    jsonPath("shortUrl").value(appProperties.getDomain() + "/" + shortCode)
             );
         }
 
@@ -86,7 +88,7 @@ class ShortenControllerTest {
             String originalUrl = "https://jeongseonghun.com";
             String shortUrl = "aaaaaab"; // 테스트용으로 사용할 고유한 값
 
-            urlRepository.save(new URL(originalUrl, shortUrl));
+            urlMappingRepository.save(new UrlMapping(originalUrl, shortUrl));
 
             // when
             ResultActions resultActions = mockMvc.perform(get("/{shortUrl}", shortUrl));
@@ -112,5 +114,4 @@ class ShortenControllerTest {
             );
         }
     }
-
 }
