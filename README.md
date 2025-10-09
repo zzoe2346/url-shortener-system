@@ -15,16 +15,14 @@
 
 같은 요소들을 목표로 합니다.
 
-**키워드:** 디자인 패턴, 가용성(Availability), 확장성(Scalability), 트레이드오프(Trade-off), Kafka, Redis, 부하 테스트
 
 ### 0.1 기술 스택
 | 구분                   | 사용 기술                             |
 | -------------------- |-----------------------------------|
-| **Backend**          | Java 17, Spring Boot, Spring Data JPA |
+| **Backend**          | Java, Spring Boot, Spring Data JPA |
 | **Database / Cache** | MySQL, Redis                      |
-| **DevOps / Infra**   | AWS (EC2, RDS, MKS 등), Docker     |
-| **Test / Load**      | JUnit5, Locust, k6                |
-| **ETC**              | Kafka                             |
+| **DevOps / Infra**   | Docker     |
+| **Test / Load**      | JUnit5, JMeter                |
 
 ## 1. 시스템 아키텍처
 <img width="5789" height="3450" alt="image" src="https://github.com/user-attachments/assets/131f12da-d23e-4cb0-b49d-14ae5dad01f5" />
@@ -40,7 +38,6 @@
   - URL 단축기의 핵심인 고유 ID 생성 방식은 시스템 환경에 따라 최적의 전략이 다르다.
   - 분산/운영 환경: 여러 서버에서 동시에 ID를 생성해도 충돌이 없어야 하니 중앙화된 Redis의 INCR 같은 원자적 연산 필요.
   - 로컬/개발 환경: 간단한 테스트를 위해 외부 의존성(Redis) 없이 메모리 기반으로 빠르게 동작하는 방식이 효율적.
-  - 확장: 향후 Zookeeper나 다른 분산 코디네이션 시스템을 도입할 가능성도 열어 둘 것.
 - 해결 방안
   - 전략 패턴(Strategy Pattern)을 적용하여 ID 생성 로직을 추상화.
   - IdSupplier 라는 인터페이스를 정의하고, 실제 생성 로직을 담은 구현체(RedisIdSupplier, InMemoryIdSupplier)를 추가.
