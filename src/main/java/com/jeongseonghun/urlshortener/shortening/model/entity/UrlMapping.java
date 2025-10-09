@@ -34,6 +34,6 @@ public class UrlMapping {
     }
 
     public String getShortUrl(String domain) {
-        return domain + this.shortCode;
+        return domain +"/"+ this.shortCode;
     }
 }
