@@ -4,6 +4,7 @@ import com.jeongseonghun.urlshortener.common.util.Base62;
 import com.jeongseonghun.urlshortener.shortening.repository.UrlMappingRepository;
 import com.jeongseonghun.urlshortener.shortening.service.IdSupplier;
 import jakarta.annotation.PostConstruct;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 import java.util.concurrent.atomic.AtomicLong;
@@ -25,6 +26,7 @@ import java.util.concurrent.atomic.AtomicLong;
  * @see IdSupplier
  */
 @Component
+@Profile("in-memory")
 public class InMemoryIdSupplier implements IdSupplier {
 
     private final UrlMappingRepository urlMappingRepository;
