@@ -1,7 +1,7 @@
 package com.jeongseonghun.urlshortener.shortening.validator;
 
+import com.jeongseonghun.urlshortener.common.exception.ValidationException;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.validation.ValidationException;
 
 /**
  * 검증(Validation)용 Chain-Of-Responsibility 패턴 구현을 위한 인터페이스.

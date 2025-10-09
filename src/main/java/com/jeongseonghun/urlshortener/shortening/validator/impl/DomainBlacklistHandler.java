@@ -1,8 +1,8 @@
 package com.jeongseonghun.urlshortener.shortening.validator.impl;
 
+import com.jeongseonghun.urlshortener.common.exception.ValidationException;
 import com.jeongseonghun.urlshortener.shortening.validator.ValidationHandler;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.validation.ValidationException;
 import org.springframework.stereotype.Component;
 
 import java.util.Set;
