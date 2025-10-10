@@ -20,7 +20,7 @@ public class UrlMapping {
     private Long id;
     @Column(nullable = false, unique = true)
     private String originalUrl;
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false)
     private String shortCode;
     @CreationTimestamp
     private LocalDateTime createdAt;
