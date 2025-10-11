@@ -5,13 +5,12 @@
 
 이 프로젝트는 Bitly처럼 긴 URL을 짧게 변환해주는 **URL 단축 서비스**를 직접 구현한 것입니다.
 
-단순히 “짧은 링크를 만드는 기능”에 그치지 않고, 제한된 서버 자원에서 인기를 얻어 트래픽이 폭증하는 상황을 가정하고
+단순히 “짧은 링크를 만드는 기능”에 그치지 않고, 제한된 서버 자원에서 트래픽이 폭증하는 상황을 가정하고
 
 - 수직적 확장(Scale-up)이 아닌 수평적 확장(Scale-out) 중심의 설계
 - 유연하고 확장성 있는 코드 작성
 - 수치로 증명하는 성능 개선
 - 가용성과 확장성을 고려한 시스템 설계
-- 트레이드오프에 기반한 기술 채택
 
 같은 요소들을 목표로 합니다.
 
@@ -37,7 +36,7 @@
 
 #### 1) 스레드 풀 기반 비동기 아키텍처 도입
 - 도전 과제
-  - 동기 방식으로 구현된 초기 API는 DB 저장과 같은 I/O Bound 작업이 전체 API 응답 시간의 대부분을 소모. 부하 테스트 결과, 이 병목으로 인해 800 TPS 수준에서 처리량 포화 및 응답 시간 급증 현상이 발생.
+  - 동기 방식으로 구현된 초기 API는 DB 저장과 같은 I/O Bound 작업이 전체 API 응답 시간의 대부분을 소모. 부하 테스트 결과, 이 병목으로 인해 600 TPS 수준에서 처리량 포화 및 응답 시간 급증 현상이 발생.
   - 사용자는 DB 작업이 끝날 때까지 기다려야 했고, 이는 TPS를 저하시키는 원인.
  
 - 해결 방안
@@ -45,12 +44,12 @@
   - API 요청을 처리하는 메인 스레드는 DB 저장 작업을 별도의 스레드 풀에 위임하고, 즉시 사용자에게 응답을 반환하도록 로직 변경. 이를 통해 DB I/O 작업을 URL 단축 작업과 분리.
 
 - 결과 및 기대 효과
-  - 기존
+  - 처리량 향상: **기존 600 TPS 수준에서 개선 후 TPS = 830 달성. 약 38% 성능 향상**.
+  - 기존 로직
     - URL 단축 요청 -> 검증 로직 실행 -> URL 단축 로직 실행 -> 원본 URL- 단축 URL 매핑 정보 DB 저장 -> 응답
-  - 변경
+  - 변경 로직
     - URL 단축 요청 -> 검증 로직 실행 -> URL 단축 로직 실행 -> 응답
     - 원본 URL- 단축 URL 매핑 정보 DB 저장은 비동기로 진행
-  - 처리량(Throughput) 향상: DB 작업 대기 시간을 제거함으로써 API의 평균 응답 시간을 단축시키고, 시스템이 더 많은 동시 요청을 처리할 수 있게 되어 처리량을 1500 TPS 이상으로 향상.
 
 #### 2) 시스템 안정성 확보를 위한 스레드 풀 제어
 - 도전 과제
@@ -62,6 +61,38 @@
 
 - 결과 및 기대 효과
   - 시스템 회복탄력성(Resilience) 확보: 예측 불가능한 트래픽 폭주 상황에서도 요청을 실패시키지 않고, 처리 속도를 늦추는 방식으로 시스템을 보호하여 서비스의 가용성과 안정성 향상.
+
+```mermaid
+sequenceDiagram
+    participant User as User (클라이언트)
+    participant Controller as UrlShorteningController
+    participant Service as ShorteningServiceImpl
+    participant Lock as RedissonClient (RLock)
+    participant Async as AsyncUrlMappingService
+    participant Repo as UrlMappingRepository
+    participant DB as Database
+
+    User->>Controller: URL 단축 요청 (originalUrl)
+    Controller->>Service: getOrCreateShortUrl(originalUrl)
+    Service->>Service: 검증 로직 실행 (shortenChain)
+    Service->>Repo: findByOriginalUrl(originalUrl)
+    Repo-->>Service: Optional.empty (신규 URL)
+
+    Service->>Lock: tryLock(originalUrl)
+    alt 락 획득 성공
+        Service->>Service: 단축 코드 생성 (Base62 + IdSupplier)
+        Service->>Async: saveToDbAsync(originalUrl, shortCode) (비동기)
+        note right of Async: 별도 Thread에서 DB 저장 수행
+        Service->>Lock: unlock()
+        Service-->>Controller: shortUrl 반환
+        Controller-->>User: 응답 (shortUrl)
+        Async->>Repo: save(new UrlMapping(originalUrl, shortCode))
+        Repo-->>Async: 저장 완료
+    else 락 획득 실패
+        Service-->>Controller: 예외 반환 ("잠시 후 다시 시도해주세요.")
+        Controller-->>User: 오류 응답
+    end
+```
 
 ### 2.2 디자인 패턴을 활용한 유연하고 확장성 있는 설계
 단순히 기능 요구사항을 만족시키는 코드를 넘어, 향후 변경에 유연하게 대처하고 유지보수 비용을 낮출 수 있는 구조를 설계하는 것을 목표로 했습니다. 이를 위해 두 가지 주요 디자인 패턴을 적용했습니다.
@@ -155,6 +186,7 @@ erDiagram
     CLICK_LOG ||--o{ URL_MAPPING : "Many To One"  
 
 ```
+
 
 
 
