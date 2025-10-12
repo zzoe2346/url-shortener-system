@@ -51,7 +51,7 @@
 
 - 결과 및 기대 효과
   - 처리량 향상: **기존 783 TPS 수준에서 개선 후 1221 TPS 달성. 약 55.9% 개선**
-<img width="3321" height="916" alt="image" src="https://github.com/user-attachments/assets/43ce5a0c-ee8d-4a85-addb-421ef2b86a12" />
+<img width="3321" height="876" alt="image" src="https://github.com/user-attachments/assets/bac57c15-dbd6-42cc-aa7b-c7473fe4e112" />
 
   - 기존 로직
     - URL 단축 요청 -> 검증 로직 실행 -> URL 단축 로직 실행 -> 원본 URL- 단축 URL 매핑 정보 DB 저장 -> 응답
