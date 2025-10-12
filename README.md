@@ -24,7 +24,7 @@
 | **Test / Load**      | JUnit5, JMeter                |
 
 ## 1. 시스템 아키텍처
-<img width="5789" height="3450" alt="image" src="https://github.com/user-attachments/assets/131f12da-d23e-4cb0-b49d-14ae5dad01f5" />
+<img width="5008" height="2000" alt="image" src="https://github.com/user-attachments/assets/437d4db7-e038-4a8a-9d8b-eee20f0837d8" />
 
 
 
