@@ -19,8 +19,8 @@
 | 구분                   | 사용 기술                             |
 | -------------------- |-----------------------------------|
 | **Backend**          | Java, Spring Boot, Spring Data JPA |
-| **Database / Cache** | MySQL, Redis                      |
-| **DevOps / Infra**   | Docker     |
+| **Databasee** | MySQL, Redis                      |
+| **DevOps**   | Docker     |
 | **Test / Load**      | JUnit5, JMeter                |
 
 ## 1. 시스템 아키텍처
