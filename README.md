@@ -15,7 +15,7 @@
 같은 요소들을 목표로 합니다.
 
 
-### 0.1 기술 스택
+### 기술 스택
 | 구분                   | 사용 기술                             |
 | -------------------- |-----------------------------------|
 | **Backend**          | Java, Spring Boot, Spring Data JPA |
@@ -27,15 +27,9 @@
 <img width="620" height="740" alt="image" src="https://github.com/user-attachments/assets/7bd315a3-9204-4adc-adf4-caad7d3bf935" />
 
 
+## 2. 도전 과제
 
-
-## 2. 주요 기능 및 기술적 도전 과제
-
-### 2.1 비동기 도입을 통한 처리량(TPS) 55.9% 향상(Write 처리량 향상)
-
-초기 동기 방식 URL 단축 API는 DB I/O 작업이 완료될 때까지 사용자의 요청을 블로킹하여, 높은 트래픽 상황에서 처리량(TPS)의 한계가 명확했습니다. 이를 개선하기 위해 비동기 처리 모델을 도입하였습니다.
-
-#### 1) 스레드 풀 기반 비동기 아키텍처 도입
+### 2.1 스레드 풀 기반 비동기 아키텍처 도입
 - 도전 과제
   - 초기 API는 동기 방식으로 동작하여, DB 저장과 같은 I/O Bound 작업이 완료될 때까지 요청 스레드가 블로킹되는 구조
   - 부하 테스트 결과, 트래픽이 증가함에 따라 커넥션 풀에서 커넥션을 획득하기 위한 대기 시간이 급증(Connection Acquire Time)했고, 이로 인해 응답 시간 지연 및 처리량 저하 현상 발생
@@ -51,7 +45,7 @@
 
 - 결과 및 기대 효과
   - 처리량 향상: **기존 783 TPS 수준에서 개선 후 1221 TPS 달성. 약 55.9% 개선**
-<img width="3321" height="876" alt="image" src="https://github.com/user-attachments/assets/bac57c15-dbd6-42cc-aa7b-c7473fe4e112" />
+    <img width="3321" height="876" alt="image" src="https://github.com/user-attachments/assets/bac57c15-dbd6-42cc-aa7b-c7473fe4e112" />
 
   - 기존 로직
     - URL 단축 요청 -> 검증 로직 실행 -> URL 단축 로직 실행 -> 원본 URL- 단축 URL 매핑 정보 DB 저장 -> 응답
@@ -59,7 +53,8 @@
     - URL 단축 요청 -> 검증 로직 실행 -> URL 단축 로직 실행 -> 응답
     - 원본 URL- 단축 URL 매핑 정보 DB 저장은 비동기로 진행
 
-#### 2) 분산 락(Distributed Lock)을 활용한 데이터 정합성 보장
+
+### 2.2 분산 락(Distributed Lock)을 활용한 비즈니스 규칙 준수
 - 도전 과제
   -   "동일한 원본 URL은 항상 동일한 단축 URL로 매핑되어야 한다"는 핵심 비즈니스 요구사항이 존재. 하지만, 높은 트래픽 환경에서 동일한 원본 URL에 대한 단축 요청이 동시에 여러 스레드(또는 여러 서버 인스턴스)에 들어올 경우 Race Condition이 발생 가능성 존재
   -   이로 인해 하나의 원본 URL에 대해 여러 개의 다른 단축 URL이 생성되어 DB에 중복 저장되는 데이터 불일치 문제가 발생 가능 
@@ -71,7 +66,7 @@
   - 데이터 정합성 확보: 동시 요청으로 인한 데이터 중복 생성을 원천적으로 차단하여 서비스의 신뢰성과 데이터 무결성을 확보.
   - 안정적인 아키텍처 구축: 향후 애플리케이션을 여러 인스턴스로 수평 확장(Scale-out)하더라도 데이터 정합성 문제가 발생하지 않는 안정적인 서비스 운영 기반 마련.
 
-#### 3) 시스템 안정성 확보를 위한 스레드 풀 제어
+### 2.3 시스템 안정성 확보를 위한 스레드 풀 제어
 - 도전 과제
   - 비동기 전환으로 처리량을 높이는 데는 성공했지만, 예상보다 더 높은 부하가 발생하자 스레드 풀의 작업 큐가 가득 차 `TaskRejectedException`이 발생하며 시스템이 불안정해지는 새로운 문제 발생.
 
@@ -82,42 +77,7 @@
 - 결과 및 기대 효과
   - 시스템 회복탄력성(Resilience) 확보: 예측 불가능한 트래픽 폭주 상황에서도 요청을 실패시키지 않고, 처리 속도를 늦추는 방식으로 시스템을 보호하여 서비스의 가용성과 안정성 향상.
 
-```mermaid
-sequenceDiagram
-    participant User as User (클라이언트)
-    participant Controller as UrlShorteningController
-    participant Service as ShorteningServiceImpl
-    participant Lock as RedissonClient (RLock)
-    participant Async as AsyncUrlMappingService
-    participant Repo as UrlMappingRepository
-    participant DB as Database
-
-    User->>Controller: URL 단축 요청 (originalUrl)
-    Controller->>Service: getOrCreateShortUrl(originalUrl)
-    Service->>Service: 검증 로직 실행 (shortenChain)
-    Service->>Repo: findByOriginalUrl(originalUrl)
-    Repo-->>Service: Optional.empty (신규 URL)
-
-    Service->>Lock: tryLock(originalUrl)
-    alt 락 획득 성공
-        Service->>Service: 단축 코드 생성 (Base62 + IdSupplier)
-        Service->>Async: saveToDbAsync(originalUrl, shortCode) (비동기)
-        note right of Async: 별도 Thread에서 DB 저장 수행
-        Service->>Lock: unlock()
-        Service-->>Controller: shortUrl 반환
-        Controller-->>User: 응답 (shortUrl)
-        Async->>Repo: save(new UrlMapping(originalUrl, shortCode))
-        Repo-->>Async: 저장 완료
-    else 락 획득 실패
-        Service-->>Controller: 예외 반환 ("잠시 후 다시 시도해주세요.")
-        Controller-->>User: 오류 응답
-    end
-```
-
-### 2.2 디자인 패턴을 활용한 유연하고 확장성 있는 설계
-단순히 기능 요구사항을 만족시키는 코드를 넘어, 향후 변경에 유연하게 대처하고 유지보수 비용을 낮출 수 있는 구조를 설계하는 것을 목표로 했습니다. 이를 위해 두 가지 주요 디자인 패턴을 적용했습니다.
-
-#### 1) 책임 연쇄 패턴(Chain-of-Responsibility)을 통한 검증 로직의 확장
+### 2.4 책임 연쇄 패턴(Chain-of-Responsibility)을 통한 검증 로직의 확장
 - 도전 과제
   - URL 단축 요청, 리다이랙션 요청이 들어왔을 때 여러 검증 과정을 거쳐야 함.
   - 예를 들어, URL 형식 검증, 자체 URL 순환 단축(무한 리다이랙션) 방지 검증, 블랙리스트 검증 등 다양한 규칙이 필요할 수 있다. 이러한 검증 로직이 서비스 코드 내에 if-else 블록으로 얽혀있다면, 새로운 검증 규칙을 추가하거나 순서를 변경하기가 매우 어렵고 복잡해 질 것임.
@@ -129,8 +89,9 @@ sequenceDiagram
 - 결과 및 기대 효과
   - SRP(단일 책임 원칙) 준수: 각 검증 로직이 별도의 클래스로 분리되어 코드의 가독성과 유지보수성이 향상.
   - 유연한 확장 및 재구성: 새로운 검증 규칙이 필요할 때 새로운 핸들러 클래스를 구현하여 체인에 추가하기만 하면 된다. 또한, 설정 파일을 통해 검증 순서를 동적으로 변경하는 것도 가능해져 비즈니스 요구사항 변화에 유연하게 대응 가능.
-#### 2) 전략 패턴(Strategy Pattern)을 통한 ID 생성 방식의 유연한 교체
-- 도전 과제 
+
+### 2.5 전략 패턴(Strategy Pattern)을 통한 ID 생성 방식 교체 용이성 확보
+- 도전 과제
   - URL 단축기의 핵심인 고유 ID 생성 방식은 시스템 환경에 따라 최적의 전략이 다르다.
   - 분산/운영 환경: 여러 서버에서 동시에 ID를 생성해도 충돌이 없어야 하니 중앙화된 Redis의 INCR 같은 원자적 연산 필요.
   - 로컬/개발 환경: 간단한 테스트를 위해 외부 의존성(Redis) 없이 메모리 기반으로 빠르게 동작하는 방식이 효율적.
@@ -171,13 +132,6 @@ sequenceDiagram
     - 접속 IP 주소 (IP Address)
     - 사용자 환경 정보 (User-Agent)
     - 유입 경로 (Referrer)
-- 통계 조회
-  - 사용자는 자신이 생성한 단축 URL의 통계 데이터를 조회할 수 있다.
-  - 제공 데이터
-    - 총 클릭 수: 해당 URL이 리다이렉션된 전체 횟수
-    - 시간별 클릭 수: 일별 또는 시간별 클릭 수 추이 (그래프 시각화)
-    - 유입 경로(Referrer) TOP 5: 어떤 웹사이트를 통해 유입되었는지 상위 5개 표시
-    - 사용자 환경(User-Agent) 분석: 브라우저 종류, 운영체제(OS)별 접속 비율
 
 ## 4. ERD
 ```mermaid
