@@ -1,10 +1,10 @@
 package com.jeongseonghun.urlshortener.shortening.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.jeongseonghun.urlshortener.common.config.AppProperties;
-import com.jeongseonghun.urlshortener.shortening.model.dto.ShortenRequest;
-import com.jeongseonghun.urlshortener.shortening.model.entity.UrlMapping;
-import com.jeongseonghun.urlshortener.shortening.repository.UrlMappingRepository;
+import com.jeongseonghun.urlshortener.config.AppProperties;
+import com.jeongseonghun.urlshortener.api.dto.ShortenRequest;
+import com.jeongseonghun.urlshortener.domain.UrlMapping;
+import com.jeongseonghun.urlshortener.repository.UrlMappingRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
