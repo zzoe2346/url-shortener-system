@@ -1,5 +1,6 @@
-package com.jeongseonghun.urlshortener.domain;
+package com.jeongseonghun.urlshortener.infrastructure;
 
+import com.jeongseonghun.urlshortener.domain.IdSupplier;
 import org.springframework.context.annotation.Profile;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;

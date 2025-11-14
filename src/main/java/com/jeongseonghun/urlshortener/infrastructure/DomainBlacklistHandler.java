@@ -1,6 +1,7 @@
-package com.jeongseonghun.urlshortener.domain.validator;
+package com.jeongseonghun.urlshortener.infrastructure;
 
-import com.jeongseonghun.urlshortener.exception.ValidationException;
+import com.jeongseonghun.urlshortener.domain.ValidationHandler;
+import com.jeongseonghun.urlshortener.domain.ValidationException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.stereotype.Component;
 

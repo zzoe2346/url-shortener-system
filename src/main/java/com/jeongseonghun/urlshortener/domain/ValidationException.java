@@ -1,4 +1,4 @@
-package com.jeongseonghun.urlshortener.exception;
+package com.jeongseonghun.urlshortener.domain;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;

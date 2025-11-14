@@ -1,5 +1,8 @@
-package com.jeongseonghun.urlshortener.domain;
+package com.jeongseonghun.urlshortener.infrastructure;
 
+import com.jeongseonghun.urlshortener.domain.ClickLog;
+import com.jeongseonghun.urlshortener.domain.ClickLogService;
+import com.jeongseonghun.urlshortener.domain.UrlMapping;
 import com.jeongseonghun.urlshortener.repository.ClickLogRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.stereotype.Service;

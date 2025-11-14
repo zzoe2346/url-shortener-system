@@ -1,6 +1,5 @@
-package com.jeongseonghun.urlshortener.domain.validator;
+package com.jeongseonghun.urlshortener.domain;
 
-import com.jeongseonghun.urlshortener.exception.ValidationException;
 import jakarta.servlet.http.HttpServletRequest;
 
 /**

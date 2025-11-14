@@ -1,7 +1,7 @@
 package com.jeongseonghun.urlshortener.config;
 
-import com.jeongseonghun.urlshortener.domain.validator.*;
-import com.jeongseonghun.urlshortener.domain.validator.ValidationHandler;
+import com.jeongseonghun.urlshortener.domain.ValidationHandler;
+import com.jeongseonghun.urlshortener.infrastructure.*;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 

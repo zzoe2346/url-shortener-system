@@ -1,10 +1,11 @@
-package com.jeongseonghun.urlshortener.domain;
+package com.jeongseonghun.urlshortener.application;
 
 import com.jeongseonghun.urlshortener.config.AppProperties;
-import com.jeongseonghun.urlshortener.exception.UrlNotFoundException;
+import com.jeongseonghun.urlshortener.domain.*;
+import com.jeongseonghun.urlshortener.domain.UrlNotFoundException;
 import com.jeongseonghun.urlshortener.support.Base62;
 import com.jeongseonghun.urlshortener.repository.UrlMappingRepository;
-import com.jeongseonghun.urlshortener.domain.validator.ValidationHandler;
+import com.jeongseonghun.urlshortener.domain.ValidationHandler;
 import jakarta.servlet.http.HttpServletRequest;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
@@ -15,7 +16,7 @@ import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 @Service
-public class ShorteningServiceImpl implements ShorteningService {
+public class DefaultShorteningService implements ShorteningService {
 
     private final UrlMappingRepository urlMappingRepository;
     private final IdSupplier idSupplier;
@@ -26,14 +27,14 @@ public class ShorteningServiceImpl implements ShorteningService {
     private final AsyncUrlMappingService asyncUrlMappingService;
     private final RedissonClient redissonClient;
 
-    public ShorteningServiceImpl(UrlMappingRepository urlMappingRepository,
-                                 IdSupplier idSupplier,
-                                 ClickLogService clickLogService,
-                                 @Qualifier("shortenValidationChain") ValidationHandler shortenChain,
-                                 @Qualifier("redirectValidationChain") ValidationHandler redirectChain,
-                                 AppProperties appProperties,
-                                 AsyncUrlMappingService asyncUrlMappingService,
-                                 RedissonClient redissonClient) {
+    public DefaultShorteningService(UrlMappingRepository urlMappingRepository,
+                                    IdSupplier idSupplier,
+                                    ClickLogService clickLogService,
+                                    @Qualifier("shortenValidationChain") ValidationHandler shortenChain,
+                                    @Qualifier("redirectValidationChain") ValidationHandler redirectChain,
+                                    AppProperties appProperties,
+                                    AsyncUrlMappingService asyncUrlMappingService,
+                                    RedissonClient redissonClient) {
         this.urlMappingRepository = urlMappingRepository;
         this.idSupplier = idSupplier;
         this.clickLogService = clickLogService;

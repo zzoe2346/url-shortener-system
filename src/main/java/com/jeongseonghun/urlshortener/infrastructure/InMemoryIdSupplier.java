@@ -1,5 +1,6 @@
-package com.jeongseonghun.urlshortener.domain;
+package com.jeongseonghun.urlshortener.infrastructure;
 
+import com.jeongseonghun.urlshortener.domain.IdSupplier;
 import com.jeongseonghun.urlshortener.support.Base62;
 import com.jeongseonghun.urlshortener.repository.UrlMappingRepository;
 import jakarta.annotation.PostConstruct;
