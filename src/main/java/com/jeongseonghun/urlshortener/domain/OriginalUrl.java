@@ -1,7 +1,10 @@
 package com.jeongseonghun.urlshortener.domain;
 
+import jakarta.persistence.Embeddable;
+
 import java.net.URI;
 
+@Embeddable
 public class OriginalUrl {
 
     private String value;
@@ -9,6 +12,10 @@ public class OriginalUrl {
     private OriginalUrl(String value) {
         this.validate(value);
         this.value = value.trim();
+    }
+
+    public OriginalUrl() {
+
     }
 
     public static OriginalUrl of(String value) {

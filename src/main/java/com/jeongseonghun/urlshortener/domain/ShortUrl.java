@@ -19,7 +19,12 @@ public class ShortUrl {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @Column(nullable = false, unique = true)
-    private String originalUrl;
+    @Embedded
+    @AttributeOverride(
+            name = "value",
+            column = @Column(name = "origin_url", nullable = false, unique = true)
+    )
+    private OriginalUrl originalUrl;
     @Column(nullable = false)
     private String shortCode;
     @CreationTimestamp
@@ -28,12 +33,12 @@ public class ShortUrl {
     private LocalDateTime updatedAt;
 
     @Builder
-    public ShortUrl(String originalUrl, String shortCode) {
+    public ShortUrl(OriginalUrl originalUrl, String shortCode) {
         this.originalUrl = originalUrl;
         this.shortCode = shortCode;
     }
 
     public String getShortUrl(String domain) {
-        return domain +"/"+ this.shortCode;
+        return domain + "/" + this.shortCode;
     }
 }
