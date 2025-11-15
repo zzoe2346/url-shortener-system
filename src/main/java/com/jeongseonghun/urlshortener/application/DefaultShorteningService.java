@@ -3,6 +3,7 @@ package com.jeongseonghun.urlshortener.application;
 import com.jeongseonghun.urlshortener.api.dto.ShortUrlResponse;
 import com.jeongseonghun.urlshortener.config.AppProperties;
 import com.jeongseonghun.urlshortener.domain.*;
+import com.jeongseonghun.urlshortener.infrastructure.ShortUrlCreationPolicyManager;
 import com.jeongseonghun.urlshortener.support.Message;
 import lombok.RequiredArgsConstructor;
 import org.redisson.api.RLock;
@@ -21,10 +22,13 @@ public class DefaultShorteningService implements ShorteningService {
     private final ShortUrlReader shortUrlReader;
     private final ShortKeyGenerator shortKeyGenerator;
     private final AppProperties appProperties;
+    private final ShortUrlCreationPolicyManager shortUrlCreationPolicyManager;
+
     private static final long WAIT_TIME = 2;
 
     public ShortUrlResponse getOrCreateShortUrl(String rawUrl) {
         OriginalUrl originalUrl = OriginalUrl.of(rawUrl);
+        shortUrlCreationPolicyManager.execute(originalUrl);
         Optional<ShortUrl> existingShortUrl = shortUrlReader.findShortUrl(originalUrl);
         if (existingShortUrl.isPresent()) {
             return ShortUrlResponse.from(existingShortUrl.get(), appProperties.getDomain());
