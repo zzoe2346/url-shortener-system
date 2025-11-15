@@ -2,7 +2,6 @@ package com.jeongseonghun.urlshortener.application;
 
 import com.jeongseonghun.urlshortener.api.dto.ShortenResponse;
 import com.jeongseonghun.urlshortener.domain.*;
-import com.jeongseonghun.urlshortener.repository.ShortUrlRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.redisson.api.RLock;
@@ -16,7 +15,6 @@ import java.util.concurrent.TimeUnit;
 @RequiredArgsConstructor
 public class DefaultShorteningService implements ShorteningService {
 
-    private final ShortUrlRepository shortUrlRepository;
     private final ClickLogWriter clickLogWriter;
     private final ShortUrlWriter shortUrlWriter;
     private final RedissonClient redissonClient;
@@ -52,10 +50,10 @@ public class DefaultShorteningService implements ShorteningService {
         }
     }
 
-    public String getOriginalUrl(String shortCode, HttpServletRequest request) {
-        ShortUrl shortUrl = shortUrlRepository.findByShortCode(shortCode)
-                .orElseThrow(() -> new UrlNotFoundException("해당 단축 코드를 찾을 수 없습니다: " + shortCode));
-        clickLogWriter.recordClick(request, shortUrl);
+    public String getOriginalUrl(String shortKey, HttpServletRequest request) {
+        ShortUrl shortUrl = shortUrlReader.findShortUrlByShortKey(shortKey)
+                .orElseThrow(() -> new UrlNotFoundException("해당 ShortKey 를 찾을 수 없습니다: " + shortKey));
+        clickLogWriter.save(new ClickLog(shortUrl, request));
         return shortUrl.getOriginalUrl().getValue();
     }
 }
