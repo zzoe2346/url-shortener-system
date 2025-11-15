@@ -2,7 +2,7 @@ package com.jeongseonghun.urlshortener.infrastructure;
 
 import com.jeongseonghun.urlshortener.domain.ClickLog;
 import com.jeongseonghun.urlshortener.domain.ClickLogService;
-import com.jeongseonghun.urlshortener.domain.UrlMapping;
+import com.jeongseonghun.urlshortener.domain.ShortUrl;
 import com.jeongseonghun.urlshortener.repository.ClickLogRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.stereotype.Service;
@@ -18,9 +18,9 @@ public class ClickLogServiceImpl implements ClickLogService {
     }
 
     @Override
-    public void recordClick(HttpServletRequest request, UrlMapping urlMapping) {
+    public void recordClick(HttpServletRequest request, ShortUrl shortUrl) {
         ClickLog clickLog = new ClickLog();
-        clickLog.setUrlMapping(urlMapping);
+        clickLog.setShortUrl(shortUrl);
         clickLog.setIpAddress(request.getHeader("X-Forwarded-For"));
         clickLog.setUserAgent(request.getHeader("User-Agent"));
         clickLog.setReferrer(request.getHeader("Referer"));

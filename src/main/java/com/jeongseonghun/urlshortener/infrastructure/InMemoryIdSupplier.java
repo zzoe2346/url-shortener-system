@@ -2,7 +2,7 @@ package com.jeongseonghun.urlshortener.infrastructure;
 
 import com.jeongseonghun.urlshortener.domain.IdSupplier;
 import com.jeongseonghun.urlshortener.support.Base62;
-import com.jeongseonghun.urlshortener.repository.UrlMappingRepository;
+import com.jeongseonghun.urlshortener.repository.ShortUrlRepository;
 import jakarta.annotation.PostConstruct;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
@@ -28,13 +28,13 @@ import java.util.concurrent.atomic.AtomicLong;
 @Component
 @Profile("in-memory")
 public class InMemoryIdSupplier implements IdSupplier {
-    private final UrlMappingRepository urlMappingRepository;
+    private final ShortUrlRepository shortUrlRepository;
 
     // 메모리 기반 카운터 역할
     private AtomicLong atomicLong;
 
-    public InMemoryIdSupplier(UrlMappingRepository urlMappingRepository) {
-        this.urlMappingRepository = urlMappingRepository;
+    public InMemoryIdSupplier(ShortUrlRepository shortUrlRepository) {
+        this.shortUrlRepository = shortUrlRepository;
     }
 
     /**
@@ -47,7 +47,7 @@ public class InMemoryIdSupplier implements IdSupplier {
      */
     @PostConstruct
     private void init() {
-        long startId = urlMappingRepository.findTopByOrderByIdDesc()
+        long startId = shortUrlRepository.findTopByOrderByIdDesc()
                 .map(mapping -> Base62.Decoder.decode(mapping.getShortCode()) + 1)
                 .orElse(1L);
         atomicLong = new AtomicLong(startId);

@@ -4,7 +4,7 @@ import com.jeongseonghun.urlshortener.config.AppProperties;
 import com.jeongseonghun.urlshortener.domain.*;
 import com.jeongseonghun.urlshortener.domain.UrlNotFoundException;
 import com.jeongseonghun.urlshortener.support.Base62;
-import com.jeongseonghun.urlshortener.repository.UrlMappingRepository;
+import com.jeongseonghun.urlshortener.repository.ShortUrlRepository;
 import com.jeongseonghun.urlshortener.domain.ValidationHandler;
 import jakarta.servlet.http.HttpServletRequest;
 import org.redisson.api.RLock;
@@ -18,7 +18,7 @@ import java.util.concurrent.TimeUnit;
 @Service
 public class DefaultShorteningService implements ShorteningService {
 
-    private final UrlMappingRepository urlMappingRepository;
+    private final ShortUrlRepository shortUrlRepository;
     private final IdSupplier idSupplier;
     private final ClickLogService clickLogService;
     private final ValidationHandler shortenChain;
@@ -27,7 +27,7 @@ public class DefaultShorteningService implements ShorteningService {
     private final AsyncUrlMappingService asyncUrlMappingService;
     private final RedissonClient redissonClient;
 
-    public DefaultShorteningService(UrlMappingRepository urlMappingRepository,
+    public DefaultShorteningService(ShortUrlRepository shortUrlRepository,
                                     IdSupplier idSupplier,
                                     ClickLogService clickLogService,
                                     @Qualifier("shortenValidationChain") ValidationHandler shortenChain,
@@ -35,7 +35,7 @@ public class DefaultShorteningService implements ShorteningService {
                                     AppProperties appProperties,
                                     AsyncUrlMappingService asyncUrlMappingService,
                                     RedissonClient redissonClient) {
-        this.urlMappingRepository = urlMappingRepository;
+        this.shortUrlRepository = shortUrlRepository;
         this.idSupplier = idSupplier;
         this.clickLogService = clickLogService;
         this.shortenChain = shortenChain;
@@ -47,7 +47,7 @@ public class DefaultShorteningService implements ShorteningService {
 
     public String getOrCreateShortUrl(String originalUrl) {
         shortenChain.validate(originalUrl);
-        Optional<UrlMapping> urlMapping = urlMappingRepository.findByOriginalUrl(originalUrl);
+        Optional<ShortUrl> urlMapping = shortUrlRepository.findByOriginalUrl(originalUrl);
         // 원본 URL과 매핑된 단축 URL이 있는 경우: 매핑된 단축 URL을 리턴
         if (urlMapping.isPresent()) {
             return urlMapping.get().getShortUrl(appProperties.getDomain());
@@ -66,10 +66,10 @@ public class DefaultShorteningService implements ShorteningService {
             String newShortCode = Base62.Encoder.encode(idSupplier.getId());
             // 3. DB에 원본 URL - 단축 URL(shortCode) 매핑 되도록 저장
             // => 비동기 처리
-            UrlMapping newUrlMapping = new UrlMapping(originalUrl, newShortCode);
+            ShortUrl newShortUrl = new ShortUrl(originalUrl, newShortCode);
             asyncUrlMappingService.saveToDbAsync(originalUrl, newShortCode);
             // 4. 단축 URL 리턴
-            return newUrlMapping.getShortUrl(appProperties.getDomain());
+            return newShortUrl.getShortUrl(appProperties.getDomain());
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         } finally {
@@ -80,9 +80,9 @@ public class DefaultShorteningService implements ShorteningService {
 
     public String getOriginalUrl(String shortCode, HttpServletRequest request) {
         redirectChain.validate(shortCode, request);
-        UrlMapping urlMapping = urlMappingRepository.findByShortCode(shortCode)
+        ShortUrl shortUrl = shortUrlRepository.findByShortCode(shortCode)
                 .orElseThrow(() -> new UrlNotFoundException("해당 단축 코드를 찾을 수 없습니다: " + shortCode));
-        clickLogService.recordClick(request, urlMapping);
-        return urlMapping.getOriginalUrl();
+        clickLogService.recordClick(request, shortUrl);
+        return shortUrl.getOriginalUrl();
     }
 }

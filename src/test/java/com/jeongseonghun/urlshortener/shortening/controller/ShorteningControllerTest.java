@@ -3,8 +3,8 @@ package com.jeongseonghun.urlshortener.shortening.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jeongseonghun.urlshortener.config.AppProperties;
 import com.jeongseonghun.urlshortener.api.dto.ShortenRequest;
-import com.jeongseonghun.urlshortener.domain.UrlMapping;
-import com.jeongseonghun.urlshortener.repository.UrlMappingRepository;
+import com.jeongseonghun.urlshortener.domain.ShortUrl;
+import com.jeongseonghun.urlshortener.repository.ShortUrlRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -27,7 +27,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 class ShorteningControllerTest {
     @Autowired
-    private UrlMappingRepository urlMappingRepository;
+    private ShortUrlRepository shortUrlRepository;
     @Autowired
     private MockMvc mockMvc;
     @Autowired
@@ -88,7 +88,7 @@ class ShorteningControllerTest {
             String originalUrl = "https://jeongseonghun.com";
             String shortUrl = "aaaaaab"; // 테스트용으로 사용할 고유한 값
 
-            urlMappingRepository.save(new UrlMapping(originalUrl, shortUrl));
+            shortUrlRepository.save(new ShortUrl(originalUrl, shortUrl));
 
             // when
             ResultActions resultActions = mockMvc.perform(get("/{shortUrl}", shortUrl));

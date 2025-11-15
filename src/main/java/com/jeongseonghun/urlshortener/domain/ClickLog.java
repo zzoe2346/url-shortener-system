@@ -17,7 +17,7 @@ public class ClickLog {
     private Long id;
     @ManyToOne
     @JoinColumn(name = "url_mapping_id")
-    private UrlMapping urlMapping;
+    private ShortUrl shortUrl;
     private String ipAddress;
     private String userAgent;
     private String referrer;
