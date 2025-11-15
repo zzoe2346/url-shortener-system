@@ -1,6 +1,7 @@
 package com.jeongseonghun.urlshortener.application;
 
 import com.jeongseonghun.urlshortener.domain.*;
+import com.jeongseonghun.urlshortener.support.Message;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -15,7 +16,7 @@ public class DefaultRedirectService implements RedirectService {
     @Override
     public String getOriginalUrl(String shortKey, HttpServletRequest request) {
         ShortUrl shortUrl = shortUrlReader.findShortUrlByShortKey(shortKey)
-                .orElseThrow(() -> new UrlNotFoundException("해당 ShortKey 를 찾을 수 없습니다: " + shortKey));
+                .orElseThrow(() -> new UrlNotFoundException(Message.SHORTKEY_NOT_FOUND));
         clickLogWriter.save(new ClickLog(shortUrl, request));
         return shortUrl.getOriginalUrl().getValue();
     }

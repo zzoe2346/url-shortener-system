@@ -1,7 +1,8 @@
 package com.jeongseonghun.urlshortener.infrastructure;
 
-import com.jeongseonghun.urlshortener.domain.ValidationHandler;
 import com.jeongseonghun.urlshortener.domain.ValidationException;
+import com.jeongseonghun.urlshortener.domain.ValidationHandler;
+import com.jeongseonghun.urlshortener.support.Message;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.stereotype.Component;
 
@@ -28,7 +29,7 @@ public class IpBlacklistHandler implements ValidationHandler {
     public void validate(String shortCode, HttpServletRequest request) throws ValidationException {
         String ip = request.getRemoteAddr();
         if (ipBlacklist.contains(ip)) {
-            throw new ValidationException("Request from blacklisted IP: " + ip);
+            throw new ValidationException(Message.IP_BLACKLISTED);
         }
         if (next != null) {
             next.validate(shortCode, request);

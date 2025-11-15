@@ -1,8 +1,9 @@
 package com.jeongseonghun.urlshortener.infrastructure;
 
 import com.jeongseonghun.urlshortener.config.AppProperties;
-import com.jeongseonghun.urlshortener.domain.ValidationHandler;
 import com.jeongseonghun.urlshortener.domain.ValidationException;
+import com.jeongseonghun.urlshortener.domain.ValidationHandler;
+import com.jeongseonghun.urlshortener.support.Message;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.stereotype.Component;
 
@@ -26,7 +27,7 @@ public class CircularShortenHandler implements ValidationHandler {
     @Override
     public void validate(String originalUrl) throws ValidationException {
         if (appProperties.getDomain().equals(extractDomain(originalUrl))) {
-            throw new ValidationException("이미 저희 서비스에서 단축하여 제공되는 URL은 단축이 불가합니다.");
+            throw new ValidationException(Message.DUPLICATE_URL);
         }
         if (next != null) {
             next.validate(originalUrl);

@@ -1,5 +1,6 @@
 package com.jeongseonghun.urlshortener.domain;
 
+import com.jeongseonghun.urlshortener.support.Message;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -39,7 +40,7 @@ public class ShortUrl {
 
     private void validate(String value) {
         if (!value.matches("^[a-zA-Z0-9]+$")) {
-            throw new ValidationException("ShortKey는 영문 대소문자와 숫자로만 구성되어야 합니다.");
+            throw new ValidationException(Message.INVALID_SHORTKEY);
         }
     }
 

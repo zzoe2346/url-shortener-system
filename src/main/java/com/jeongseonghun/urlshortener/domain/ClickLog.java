@@ -5,6 +5,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
+import org.springframework.http.HttpHeaders;
 
 import java.time.LocalDateTime;
 
@@ -12,6 +13,9 @@ import java.time.LocalDateTime;
 @Getter
 @NoArgsConstructor
 public class ClickLog {
+
+    public static final String X_FORWARDED_FOR = "X-Forwarded-For";
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -27,9 +31,9 @@ public class ClickLog {
 
     public ClickLog(ShortUrl shortUrl, HttpServletRequest request) {
         this.shortUrl = shortUrl;
-        this.ipAddress = request.getHeader("X-Forwarded-For");
-        this.userAgent = request.getHeader("User-Agent");
-        this.referrer = request.getHeader("Referer");
-        this.acceptLanguage = request.getHeader("Accept-Language");
+        this.ipAddress = request.getHeader(X_FORWARDED_FOR);
+        this.userAgent = request.getHeader(HttpHeaders.USER_AGENT);
+        this.referrer = request.getHeader(HttpHeaders.REFERER);
+        this.acceptLanguage = request.getHeader(HttpHeaders.ACCEPT_LANGUAGE);
     }
 }

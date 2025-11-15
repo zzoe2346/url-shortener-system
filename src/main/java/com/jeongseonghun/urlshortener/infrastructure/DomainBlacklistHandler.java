@@ -2,6 +2,7 @@ package com.jeongseonghun.urlshortener.infrastructure;
 
 import com.jeongseonghun.urlshortener.domain.ValidationHandler;
 import com.jeongseonghun.urlshortener.domain.ValidationException;
+import com.jeongseonghun.urlshortener.support.Message;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.stereotype.Component;
 
@@ -22,7 +23,7 @@ public class DomainBlacklistHandler implements ValidationHandler {
     public void validate(String originalUrl) throws ValidationException {
         for (String blacklisted : blacklist) {
             if (originalUrl.contains(blacklisted)) {
-                throw new ValidationException("URL is blacklisted: " + blacklisted);
+                throw new ValidationException(Message.URL_BLACKLISTED);
             }
         }
         if (next != null) {
