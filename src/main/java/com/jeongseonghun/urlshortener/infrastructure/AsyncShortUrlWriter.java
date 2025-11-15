@@ -4,9 +4,9 @@ import com.jeongseonghun.urlshortener.domain.ShortUrl;
 import com.jeongseonghun.urlshortener.domain.ShortUrlWriter;
 import com.jeongseonghun.urlshortener.repository.ShortUrlRepository;
 import org.springframework.scheduling.annotation.Async;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
-@Service
+@Component
 public class AsyncShortUrlWriter implements ShortUrlWriter {
 
     private final ShortUrlRepository shortUrlRepository;
