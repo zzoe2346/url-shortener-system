@@ -1,7 +1,6 @@
 package com.jeongseonghun.urlshortener.domain;
 
 import jakarta.persistence.*;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -22,7 +21,7 @@ public class ShortUrl {
     @Embedded
     @AttributeOverride(
             name = "value",
-            column = @Column(name = "origin_url", nullable = false, unique = true)
+            column = @Column(name = "original_url", nullable = false, unique = true)
     )
     private OriginalUrl originalUrl;
     @Column(nullable = false)
@@ -32,13 +31,19 @@ public class ShortUrl {
     @UpdateTimestamp
     private LocalDateTime updatedAt;
 
-    @Builder
     public ShortUrl(OriginalUrl originalUrl, String shortKey) {
+        this.validate(shortKey);
         this.originalUrl = originalUrl;
         this.shortKey = shortKey;
     }
 
+    private void validate(String value) {
+        if (!value.matches("^[a-zA-Z0-9]+$")) {
+            throw new ValidationException("ShortKey는 영문 대소문자와 숫자로만 구성되어야 합니다.");
+        }
+    }
+
     public String getShortUrl(String domain) {
-        return "https://"+ domain + "/" + this.shortKey;
+        return "https://" + domain + "/" + this.shortKey;
     }
 }
