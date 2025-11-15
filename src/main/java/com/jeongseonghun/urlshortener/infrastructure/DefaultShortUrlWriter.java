@@ -4,16 +4,12 @@ import com.jeongseonghun.urlshortener.domain.ShortUrl;
 import com.jeongseonghun.urlshortener.domain.ShortUrlWriter;
 import com.jeongseonghun.urlshortener.repository.ShortUrlRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.scheduling.annotation.Async;
-import org.springframework.stereotype.Component;
 
-@Component
 @RequiredArgsConstructor
-public class AsyncShortUrlWriter implements ShortUrlWriter {
+public class DefaultShortUrlWriter implements ShortUrlWriter {
 
     private final ShortUrlRepository shortUrlRepository;
 
-    @Async
     public void save(ShortUrl shortUrl) {
         shortUrlRepository.save(shortUrl);
     }

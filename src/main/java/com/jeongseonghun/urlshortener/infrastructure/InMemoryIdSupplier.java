@@ -4,6 +4,7 @@ import com.jeongseonghun.urlshortener.domain.IdSupplier;
 import com.jeongseonghun.urlshortener.support.Base62;
 import com.jeongseonghun.urlshortener.repository.ShortUrlRepository;
 import jakarta.annotation.PostConstruct;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
@@ -27,15 +28,11 @@ import java.util.concurrent.atomic.AtomicLong;
  */
 @Component
 @Profile("in-memory")
+@RequiredArgsConstructor
 public class InMemoryIdSupplier implements IdSupplier {
     private final ShortUrlRepository shortUrlRepository;
-
     // 메모리 기반 카운터 역할
     private AtomicLong atomicLong;
-
-    public InMemoryIdSupplier(ShortUrlRepository shortUrlRepository) {
-        this.shortUrlRepository = shortUrlRepository;
-    }
 
     /**
      * 카운터 초기화용 메서드.

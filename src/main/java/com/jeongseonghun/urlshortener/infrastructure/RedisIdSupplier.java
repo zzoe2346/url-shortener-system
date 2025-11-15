@@ -1,6 +1,7 @@
 package com.jeongseonghun.urlshortener.infrastructure;
 
 import com.jeongseonghun.urlshortener.domain.IdSupplier;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Profile;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
@@ -17,15 +18,11 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @Profile("redis")
+@RequiredArgsConstructor
 public class RedisIdSupplier implements IdSupplier {
 
     private final StringRedisTemplate redisTemplate;
     private static final String COUNTER_KEY = "ID_Counter";
-
-    public RedisIdSupplier(StringRedisTemplate redisTemplate) {
-        this.redisTemplate = redisTemplate;
-    }
-
 
     @Override
     public Long getId() {
