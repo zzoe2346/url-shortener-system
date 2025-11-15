@@ -3,6 +3,7 @@ package com.jeongseonghun.urlshortener.application;
 import com.jeongseonghun.urlshortener.config.AppProperties;
 import com.jeongseonghun.urlshortener.domain.*;
 import com.jeongseonghun.urlshortener.domain.UrlNotFoundException;
+import com.jeongseonghun.urlshortener.infrastructure.AsyncShortUrlWriter;
 import com.jeongseonghun.urlshortener.support.Base62;
 import com.jeongseonghun.urlshortener.repository.ShortUrlRepository;
 import com.jeongseonghun.urlshortener.domain.ValidationHandler;
@@ -20,24 +21,24 @@ public class DefaultShorteningService implements ShorteningService {
 
     private final ShortUrlRepository shortUrlRepository;
     private final IdSupplier idSupplier;
-    private final ClickLogService clickLogService;
+    private final ClickLogWriter clickLogWriter;
     private final ValidationHandler shortenChain;
     private final ValidationHandler redirectChain;
     private final AppProperties appProperties;
-    private final AsyncUrlMappingService asyncUrlMappingService;
+    private final AsyncShortUrlWriter asyncUrlMappingService;
     private final RedissonClient redissonClient;
 
     public DefaultShorteningService(ShortUrlRepository shortUrlRepository,
                                     IdSupplier idSupplier,
-                                    ClickLogService clickLogService,
+                                    ClickLogWriter clickLogWriter,
                                     @Qualifier("shortenValidationChain") ValidationHandler shortenChain,
                                     @Qualifier("redirectValidationChain") ValidationHandler redirectChain,
                                     AppProperties appProperties,
-                                    AsyncUrlMappingService asyncUrlMappingService,
+                                    AsyncShortUrlWriter asyncUrlMappingService,
                                     RedissonClient redissonClient) {
         this.shortUrlRepository = shortUrlRepository;
         this.idSupplier = idSupplier;
-        this.clickLogService = clickLogService;
+        this.clickLogWriter = clickLogWriter;
         this.shortenChain = shortenChain;
         this.redirectChain = redirectChain;
         this.appProperties = appProperties;
@@ -82,7 +83,7 @@ public class DefaultShorteningService implements ShorteningService {
         redirectChain.validate(shortCode, request);
         ShortUrl shortUrl = shortUrlRepository.findByShortCode(shortCode)
                 .orElseThrow(() -> new UrlNotFoundException("해당 단축 코드를 찾을 수 없습니다: " + shortCode));
-        clickLogService.recordClick(request, shortUrl);
+        clickLogWriter.recordClick(request, shortUrl);
         return shortUrl.getOriginalUrl();
     }
 }

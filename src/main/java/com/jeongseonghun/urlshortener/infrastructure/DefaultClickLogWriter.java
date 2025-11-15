@@ -1,7 +1,7 @@
 package com.jeongseonghun.urlshortener.infrastructure;
 
 import com.jeongseonghun.urlshortener.domain.ClickLog;
-import com.jeongseonghun.urlshortener.domain.ClickLogService;
+import com.jeongseonghun.urlshortener.domain.ClickLogWriter;
 import com.jeongseonghun.urlshortener.domain.ShortUrl;
 import com.jeongseonghun.urlshortener.repository.ClickLogRepository;
 import jakarta.servlet.http.HttpServletRequest;
@@ -10,10 +10,10 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 
 @Service
-public class ClickLogServiceImpl implements ClickLogService {
+public class DefaultClickLogWriter implements ClickLogWriter {
     private final ClickLogRepository clickLogRepository;
 
-    public ClickLogServiceImpl(ClickLogRepository clickLogRepository) {
+    public DefaultClickLogWriter(ClickLogRepository clickLogRepository) {
         this.clickLogRepository = clickLogRepository;
     }
 
