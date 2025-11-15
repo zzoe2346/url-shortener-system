@@ -32,7 +32,8 @@ com.jeongseonghun.urlshortener
 
 ## 2. System Design
 ### 확장성을 고려한 구조 (To-Be)
-<img width="620" height="740" alt="image" src="https://github.com/user-attachments/assets/7bd315a3-9204-4adc-adf4-caad7d3bf935" />
+<img width="2364" height="1204" alt="image" src="https://github.com/user-attachments/assets/5842043c-bcb1-486a-850f-11910d2153ee" />
+
 
 
 ## 3. Challenge
