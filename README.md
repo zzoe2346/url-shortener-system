@@ -14,22 +14,30 @@
 
 같은 요소들을 목표로 합니다.
 
-
 ### 기술 스택
-| 구분                   | 사용 기술                             |
-| -------------------- |-----------------------------------|
-| **Backend**          | Java, Spring Boot, Spring Data JPA |
-| **Databasee** | MySQL, Redis                      |
-| **DevOps**   | Docker     |
-| **Test / Load**      | JUnit5, JMeter                |
+Java, Spring Boot, JPA, MySQL, Redis, JUnit, JMeter
 
-## 1. 시스템 아키텍처
+## 1. Project Structure
+```
+com.jeongseonghun.urlshortener
+ ┣ 📂 api            → 외부의 요청을 받고 응답하는 웹 계층(@RestController)
+ ┣ 📂 application    → 실제 비즈니스 로직을 처리하는 서비스 계층(@Service)
+ ┣ 📂 config         → 애플리케이션의 설정을 담당
+ ┣ 📂 domain         → 가장 핵심적인 도메인 모델과 비즈니스 규칙 정의(Entities, Interfaces)
+ ┣ 📂 infrastructure → 도메인 설계 및 규칙들 구현을 담당하는 계층(@Component) 
+ ┣ 📂 repository     → 데이터베이스와의 통신을 담당하는 데이터 영속성 계층(@Repository)
+ ┣ 📂 support        → 특정 도메인에 종속되지 않는 범용 유틸리티 클래스 모음
+ ┗ 🅒 UrlShortenerApplication.java
+```
+
+## 2. System Design
+### 확장성을 고려한 구조 (To-Be)
 <img width="620" height="740" alt="image" src="https://github.com/user-attachments/assets/7bd315a3-9204-4adc-adf4-caad7d3bf935" />
 
 
-## 2. 도전 과제
+## 3. Challenge
 
-### 2.1 스레드 풀 기반 비동기 아키텍처 도입
+### 3.1 스레드 풀 기반 비동기 아키텍처 도입
 - 도전 과제
   - 초기 API는 동기 방식으로 동작하여, DB 저장과 같은 I/O Bound 작업이 완료될 때까지 요청 스레드가 블로킹되는 구조
   - 부하 테스트 결과, 트래픽이 증가함에 따라 커넥션 풀에서 커넥션을 획득하기 위한 대기 시간이 급증(Connection Acquire Time)했고, 이로 인해 응답 시간 지연 및 처리량 저하 현상 발생
@@ -57,7 +65,7 @@
 
 
 
-### 2.2 분산 락(Distributed Lock)을 활용한 비즈니스 규칙 준수
+### 3.2 분산 락(Distributed Lock)을 활용한 비즈니스 규칙 준수
 - 도전 과제
   -   "동일한 원본 URL은 항상 동일한 단축 URL로 매핑되어야 한다"는 핵심 비즈니스 요구사항이 존재. 하지만, 높은 트래픽 환경에서 동일한 원본 URL에 대한 단축 요청이 동시에 여러 스레드(또는 여러 서버 인스턴스)에 들어올 경우 Race Condition이 발생 가능성 존재
   -   이로 인해 하나의 원본 URL에 대해 여러 개의 다른 단축 URL이 생성되어 DB에 중복 저장되는 데이터 불일치 문제가 발생 가능 
@@ -69,7 +77,7 @@
   - 동시 요청으로 인한 데이터 중복 생성을 원천적으로 차단하여 비즈니스 규칙 준수
   - 향후 애플리케이션을 여러 인스턴스로 수평 확장하더라도 비즈니스 규칙 위반이 발생하지 않는 운영 기반 마련
 
-### 2.3 시스템 안정성 확보를 위한 스레드 풀 제어
+### 3.3 시스템 안정성 확보를 위한 스레드 풀 제어
 - 도전 과제
   - 비동기 전환으로 처리량을 높이는 데는 성공했지만, 예상보다 더 높은 부하가 발생하자 스레드 풀의 작업 큐가 가득 차 `TaskRejectedException`이 발생하며 시스템이 불안정해지는 문제 발생
 - 해결 방안
@@ -78,22 +86,7 @@
 - 결과 및 기대 효과
   - 예측 불가능한 트래픽 폭주 상황에서도 요청을 실패시키지 않고, 처리 속도를 늦추는 방식을 도입하여 실패 응답이 아닌 정상적 응답 보장
 
-### 2.4 책임 연쇄 패턴(Chain-of-Responsibility)을 통한 검증 로직의 확장
-- 도전 과제
-  - URL 단축 요청, 리다이랙션 요청이 들어왔을 때 여러 검증 과정을 거쳐야 함
-  - 예를 들어, URL 형식 검증, 자체 URL 순환 단축(무한 리다이랙션) 방지 검증, 블랙리스트 검증 등 다양한 규칙이 필요할 수 있다. 이러한 검증 로직이 서비스 코드 내에 if-else 블록으로 얽혀있다면, 새로운 검증 규칙을 추가하거나 순서를 변경하기가 매우 어렵고 복잡해 질 것
-- 해결 방안
-  - 책임 연쇄 패턴(Chain-of-Responsibility)을 도입하여 각 검증 로직을 독립적인 객체로 분리
-  - 모든 검증 객체가 구현해야 하는 `ValidationHandler` 인터페이스를 정의
-  - `UrlFormatValidator`, `CircularShorteningValidator` 등 각 검증 책임을 가진 구체적인 핸들러 클래스를 구현
-  - 이 핸들러들을 체인으로 연결하여, 요청이 들어오면 체인의 첫 번째 핸들러부터 순서대로 검증을 수행하도록 구성
-  - 각 핸들러는 검증을 통과하면 다음 핸들러로 요청을 전달하고, 실패하면 즉시 처리 중단
-- 결과 및 기대 효과
-  - 각 검증 로직이 별도의 클래스로 분리되어 코드의 가독성과 유지보수성이 향상
-  - 새로운 검증 규칙이 필요할 때 새로운 핸들러 클래스를 구현하여 체인에 추가하기만 하면 됨
-  - 설정 파일을 통해 검증 순서를 동적으로 변경하는 것도 가능하여 비즈니스 요구사항 변화에 유연하게 대응 가능
-
-### 2.5 전략 패턴(Strategy Pattern)을 통한 ID 생성 방식 교체 용이성 확보
+### 2.4 전략 패턴(Strategy Pattern)을 통한 ID 생성 방식 교체 용이성 확보
 - 도전 과제
   - URL 단축기의 핵심인 고유 ID 생성 방식은 시스템 환경에 따라 최적의 전략이 다름
   - 분산/운영 환경: 여러 서버에서 동시에 ID를 생성해도 충돌이 없어야 하니 중앙화된 Redis의 INCR 같은 원자적 연산 필요
@@ -135,35 +128,6 @@
     - 접속 IP 주소 (IP Address)
     - 사용자 환경 정보 (User-Agent)
     - 유입 경로 (Referrer)
-
-## 4. ERD
-```mermaid
-erDiagram
-    direction LR
-
-    URL_MAPPING {
-        BIGINT id PK
-        VARCHAR originalUrl
-        VARCHAR shortCode
-        DATETIME createdAt
-        DATETIME expiredAt
-    }
-
-    CLICK_LOG {
-        BIGINT id PK
-        BIGINT urlMaapingId FK
-        VARCHAR ipAddress
-        VARCHAR userAgent
-        VARCHAR referrer
-        VARCHAR acceptLanguage
-        DATETIME clickedAt
-    }
-
-    URL_MAPPING ||--o{ CLICK_LOG : "One To Many"
-    CLICK_LOG ||--o{ URL_MAPPING : "Many To One"  
-
-```
-
 
 
 
