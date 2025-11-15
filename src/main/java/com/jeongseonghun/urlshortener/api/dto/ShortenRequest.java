@@ -1,4 +1,6 @@
 package com.jeongseonghun.urlshortener.api.dto;
 
-public record ShortenRequest(String originalUrl) {
+import jakarta.validation.constraints.NotBlank;
+
+public record ShortenRequest(@NotBlank String originalUrl) {
 }
