@@ -1,10 +1,12 @@
 package com.jeongseonghun.urlshortener.domain;
 
 import jakarta.persistence.Embeddable;
+import lombok.Getter;
 
 import java.net.URI;
 
 @Embeddable
+@Getter
 public class OriginalUrl {
 
     private String value;
@@ -28,10 +30,6 @@ public class OriginalUrl {
         } catch (Exception e) {
             throw new IllegalArgumentException(url);
         }
-    }
-
-    public String value() {
-        return value;
     }
 
 }
