@@ -26,19 +26,19 @@ public class ShortUrl {
     )
     private OriginalUrl originalUrl;
     @Column(nullable = false)
-    private String shortCode;
+    private String shortKey;
     @CreationTimestamp
     private LocalDateTime createdAt;
     @UpdateTimestamp
     private LocalDateTime updatedAt;
 
     @Builder
-    public ShortUrl(OriginalUrl originalUrl, String shortCode) {
+    public ShortUrl(OriginalUrl originalUrl, String shortKey) {
         this.originalUrl = originalUrl;
-        this.shortCode = shortCode;
+        this.shortKey = shortKey;
     }
 
     public String getShortUrl(String domain) {
-        return domain + "/" + this.shortCode;
+        return domain + "/" + this.shortKey;
     }
 }

@@ -48,7 +48,7 @@ public class InMemoryIdSupplier implements IdSupplier {
     @PostConstruct
     private void init() {
         long startId = shortUrlRepository.findTopByOrderByIdDesc()
-                .map(mapping -> Base62.Decoder.decode(mapping.getShortCode()) + 1)
+                .map(mapping -> Base62.Decoder.decode(mapping.getShortKey()) + 1)
                 .orElse(1L);
         atomicLong = new AtomicLong(startId);
     }
