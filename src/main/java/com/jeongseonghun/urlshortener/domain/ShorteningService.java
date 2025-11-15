@@ -1,7 +1,6 @@
 package com.jeongseonghun.urlshortener.domain;
 
-import com.jeongseonghun.urlshortener.api.dto.ShortenResponse;
-import jakarta.servlet.http.HttpServletRequest;
+import com.jeongseonghun.urlshortener.api.dto.ShortUrlResponse;
 
 /**
  * URL 단축 기능의 핵심 비즈니스 로직을 정의하는 인터페이스.
@@ -14,5 +13,5 @@ public interface ShorteningService {
      * @param originalUrl 원본 URL
      * @return 생성되었거나 조회된 단축 URL
      */
-    ShortenResponse getOrCreateShortUrl(String originalUrl);
+    ShortUrlResponse getOrCreateShortUrl(String originalUrl);
 }

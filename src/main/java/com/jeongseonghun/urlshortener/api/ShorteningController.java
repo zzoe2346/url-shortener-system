@@ -1,7 +1,7 @@
 package com.jeongseonghun.urlshortener.api;
 
 import com.jeongseonghun.urlshortener.api.dto.ShortenRequest;
-import com.jeongseonghun.urlshortener.api.dto.ShortenResponse;
+import com.jeongseonghun.urlshortener.api.dto.ShortUrlResponse;
 import com.jeongseonghun.urlshortener.domain.RedirectService;
 import com.jeongseonghun.urlshortener.domain.ShorteningService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -33,7 +33,7 @@ public class ShorteningController {
      * @return 생성된 단축 URL 키 정보를 담은 ResponseEntity 객체
      */
     @PostMapping("/urls")
-    public ResponseEntity<ShortenResponse> shorten(@RequestBody ShortenRequest request) {
+    public ResponseEntity<ShortUrlResponse> shorten(@RequestBody ShortenRequest request) {
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(shorteningService.getOrCreateShortUrl(request.originalUrl()));

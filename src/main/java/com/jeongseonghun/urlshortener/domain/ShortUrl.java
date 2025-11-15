@@ -39,6 +39,6 @@ public class ShortUrl {
     }
 
     public String getShortUrl(String domain) {
-        return domain + "/" + this.shortKey;
+        return "https://"+ domain + "/" + this.shortKey;
     }
 }

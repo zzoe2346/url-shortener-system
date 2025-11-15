@@ -1,6 +1,7 @@
 package com.jeongseonghun.urlshortener.application;
 
-import com.jeongseonghun.urlshortener.api.dto.ShortenResponse;
+import com.jeongseonghun.urlshortener.api.dto.ShortUrlResponse;
+import com.jeongseonghun.urlshortener.config.AppProperties;
 import com.jeongseonghun.urlshortener.domain.*;
 import lombok.RequiredArgsConstructor;
 import org.redisson.api.RLock;
@@ -18,12 +19,13 @@ public class DefaultShorteningService implements ShorteningService {
     private final RedissonClient redissonClient;
     private final ShortUrlReader shortUrlReader;
     private final ShortKeyGenerator shortKeyGenerator;
+    private final AppProperties appProperties;
 
-    public ShortenResponse getOrCreateShortUrl(String rawUrl) {
+    public ShortUrlResponse getOrCreateShortUrl(String rawUrl) {
         OriginalUrl originalUrl = OriginalUrl.of(rawUrl);
         Optional<ShortUrl> existingShortUrl = shortUrlReader.findShortUrl(originalUrl);
         if (existingShortUrl.isPresent()) {
-            return ShortenResponse.from(existingShortUrl.get());
+            return ShortUrlResponse.from(existingShortUrl.get(), appProperties.getDomain());
         }
         RLock lock = redissonClient.getLock(originalUrl.getValue());
         try {
@@ -33,7 +35,7 @@ public class DefaultShorteningService implements ShorteningService {
             }
             ShortUrl newShortUrl = new ShortUrl(originalUrl, shortKeyGenerator.generateShortKey());
             shortUrlWriter.saveToDbAsync(newShortUrl);
-            return ShortenResponse.from(newShortUrl);
+            return ShortUrlResponse.from(newShortUrl, appProperties.getDomain());
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         } finally {
