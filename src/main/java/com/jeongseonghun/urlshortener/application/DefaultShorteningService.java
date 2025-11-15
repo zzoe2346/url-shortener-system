@@ -34,7 +34,7 @@ public class DefaultShorteningService implements ShorteningService {
                 throw new RuntimeException("잠시 후 다시 시도해주세요.");
             }
             ShortUrl newShortUrl = new ShortUrl(originalUrl, shortKeyGenerator.generateShortKey());
-            shortUrlWriter.saveToDbAsync(newShortUrl);
+            shortUrlWriter.save(newShortUrl);
             return ShortUrlResponse.from(newShortUrl, appProperties.getDomain());
         } catch (InterruptedException e) {
             throw new RuntimeException(e);

@@ -16,7 +16,8 @@ public class AsyncShortUrlWriter implements ShortUrlWriter {
     }
 
     @Async
-    public void saveToDbAsync(ShortUrl shortUrl) {
+    public void save(ShortUrl shortUrl) {
         shortUrlRepository.save(shortUrl);
     }
+
 }

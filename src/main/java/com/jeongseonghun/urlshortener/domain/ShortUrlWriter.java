@@ -6,5 +6,5 @@ public interface ShortUrlWriter {
      * @param originalUrl
      * @param shortCode
      */
-    void saveToDbAsync(ShortUrl shortUrl);
+    void save(ShortUrl shortUrl);
 }
