@@ -59,14 +59,13 @@ com.jeongseonghun.urlshortener
     - URL 단축 요청 -> 검증 로직 실행 -> URL 단축 로직 실행 -> 원본 URL- 단축 URL 매핑 정보 DB 저장 -> 응답
   - 변경 로직
     - URL 단축 요청 -> 검증 로직 실행 -> URL 단축 로직 실행 -> 응답
-    - 원본 URL- 단축 URL 매핑 정보 DB 저장은 비동기로 진행
+    - 원본 URL - 단축 URL 매핑 정보 DB 저장은 비동기로 진행
+  
 <img width="1200" height="500" alt="img_2" src="https://github.com/user-attachments/assets/b4a55152-e24a-476d-bd15-36a852d64526" />
 
 - 결과
   - 처리량 향상: **기존 783 TPS 수준에서 개선 후 1221 TPS 달성. 약 55.9% 개선**
-    <img width="3321" height="876" alt="image" src="https://github.com/user-attachments/assets/bac57c15-dbd6-42cc-aa7b-c7473fe4e112" />
-
-
+<img width="3321" height="876" alt="image" src="https://github.com/user-attachments/assets/bac57c15-dbd6-42cc-aa7b-c7473fe4e112" />
 
 
 ### 3.2 분산 락(Distributed Lock)을 활용한 비즈니스 규칙 준수
@@ -83,14 +82,16 @@ com.jeongseonghun.urlshortener
 
 ### 3.3 시스템 안정성 확보를 위한 스레드 풀 제어
 - 도전 과제
-  - 비동기 전환으로 처리량을 높이는 데는 성공했지만, 예상보다 더 높은 부하가 발생하자 스레드 풀의 작업 큐가 가득 차 `TaskRejectedException`이 발생하며 시스템이 불안정해지는 문제 발생
+  - 비동기 전환으로 처리량을 높이는 데는 성공했
+  - 하지만 부하를 지속하자, 스레드 풀의 작업 큐가 가득 차 `TaskRejectedException`이 발생하며 시스템이 불안정해지는 문제 발생
 - 해결 방안
   - 큐가 가득 찼을 때 예외가 아닌 동기 방식으로 전환하기위해 스레드 풀의 거부 정책(Rejection Policy)을 기본 `AbortPolicy`에서 `CallerRunsPolicy`로 변경
-  - 이 정책은 작업 큐가 가득 찼을 때, 작업을 요청한 API 스레드가 직접 해당 작업을 동기적으로 처리하도록 유도. 백프레셔(Backpressure)를 적용하여 유입되는 트래픽의 속도를 조절하는 효과
+  - 이 정책은 작업 큐가 가득 찼을 때, 작업을 요청한 API 스레드가 직접 해당 작업을 동기적으로 처리
+  - 백프레셔를 적용하여 유입되는 트래픽의 속도를 조절
 - 결과 및 기대 효과
-  - 예측 불가능한 트래픽 폭주 상황에서도 요청을 실패시키지 않고, 처리 속도를 늦추는 방식을 도입하여 실패 응답이 아닌 정상적 응답 보장
+  - 부하가 지속되어도 요청을 실패시키지 않고, 처리 속도를 늦추는 방식을 도입하여 실패 응답이 아닌 정상적 응답 보장
 
-### 2.4 전략 패턴(Strategy Pattern)을 통한 ID 생성 방식 교체 용이성 확보
+### 3.4 전략 패턴(Strategy Pattern)을 통한 ID 생성 방식 교체 용이성 확보
 - 도전 과제
   - URL 단축기의 핵심인 고유 ID 생성 방식은 시스템 환경에 따라 최적의 전략이 다름
   - 분산/운영 환경: 여러 서버에서 동시에 ID를 생성해도 충돌이 없어야 하니 중앙화된 Redis의 INCR 같은 원자적 연산 필요
@@ -103,35 +104,6 @@ com.jeongseonghun.urlshortener
   - 운영 환경과 개발 환경의 ID 생성 전략을 코드를 수정하지 않고 손쉽게 전환 가능
   - 새로운 ID 생성 방식(ex. `DatabaseIdSupplier`)이 필요할 경우, 기존 코드를 수정하지 않고 `IdSupplier`의 새로운 구현체만 추가하면 되어 확장에 유리
 
-## 3. 기능 요구사항 정리
-### 3.1 URL 단축 기능
-- 입력
-  - 사용자는 원본 URL을 입력한다.
-- 처리
-  - 시스템은 입력된 URL의 유효성을 검증한다. (e.g., http:// 또는 https://로 시작)
-  - 고유하고 충돌 없는 코드(Short Code)를 생성한다. (예: aB1cD2e)
-  - 원본 URL과 짧은 키를 데이터베이스에 매핑하여 저장한다.
-- 출력
-  - 생성된 전체 단축 URL을 사용자에게 반환한다. (예: https://jeonsonghun.com/aB1cD2e)
-- 제약 조건 
-  - 이미 단축된 자체 서비스 URL은 다시 단축할 수 없다. (무한 리다이렉션 방지)
-### 3.2 단축 URL 리다이랙션 기능
-- 입력
-  - 사용자가 브라우저를 통해 단축 URL에 접속한다.
-- 처리
-  - 시스템은 URL의 PathVariable의 ShortCode를 파싱하여 데이터베이스에서 원본 URL을 조회한다.
-  - 해당 ShortCode가 존재하면, 원본 URL로 HTTP 301 Moved Permanently 리다이렉션을 수행한다.
-  - 해당 ShortCode가 존재하지 않으면, 404 Not Found 페이지를 반환한다.
-- 부가 처리
-  - 리다이렉션이 성공할 때마다 '클릭 로그'를 기록한다.
-### 3.3 단축 URL 클릭 로그 기록 및 통계 조회 기능
-- 로그 기록
-  - 리다이렉션이 발생할 때마다 다음 정보를 수집하여 별도의 로그 저장소나 메시지 큐로 전송한다.
-    - 단축 코드 (ShortCode)
-    - 클릭 발생 시간 (Timestamp)
-    - 접속 IP 주소 (IP Address)
-    - 사용자 환경 정보 (User-Agent)
-    - 유입 경로 (Referrer)
 
 
 
