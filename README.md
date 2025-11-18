@@ -1,5 +1,4 @@
 # URL Shortener System
-<img width="2368" height="768" alt="image" src="https://github.com/user-attachments/assets/0a9c86e0-0823-4739-990a-e77a08f1095e" />
 
 ## 0. 프로젝트 개요
 
