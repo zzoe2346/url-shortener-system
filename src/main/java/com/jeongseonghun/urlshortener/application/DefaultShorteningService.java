@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
@@ -26,6 +27,8 @@ public class DefaultShorteningService implements ShorteningService {
 
     private static final long WAIT_TIME = 2;
 
+    @Override
+    @Transactional
     public ShortUrlResponse getOrCreateShortUrl(String rawUrl) {
         OriginalUrl originalUrl = OriginalUrl.of(rawUrl);
         shortUrlCreationPolicyManager.execute(originalUrl);
