@@ -26,7 +26,7 @@ public class ShorteningController {
      * 성공적으로 처리되면 HTTP 201 Created 상태 코드와 함께 생성된 단축 URL을 응답한다.
      * </p>
      *
-     * @param request 단축할 원본 URL을 담은 요청 DTO. {@code @Valid}를 통해 유효성 검사 수행함.
+     * @param request 단축할 원본 URL을 담은 요청 DTO. {@link  Valid}를 통해 유효성 검사 수행함.
      * @return 생성된 단축 URL 키 정보를 담은 ResponseEntity 객체
      */
     @PostMapping("/urls")
